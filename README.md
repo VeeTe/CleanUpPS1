@@ -1,6 +1,22 @@
 # CleanUpPS1
 Clean up powershell scripts 
 
+## Usage:
+
+### One-time setup (per unique powershell script):
+Once this is done you do not have to repeat it with the same powershell script:
+1. Optional: if using your own dictionary, ensure you remove the bad characters & sus words from it. ``sed -i 's/[,"\\]//g' cleanwords.txt``
+2. ``sed -n -e 's/[^"]*"\([^"]*\)"/\1\n/gp' script.ps1 > PotentiallyBadStrings.txt``
+3. ``cat PotentiallyBadStrings.txt | sort -u > UniquePotentiallyBadStrings.txt`` 
+4. Manually examine the ``UniquePotentiallyBadStrings.txt`` strings add strings that should be replaced or remove unnecessary words that should not be replaced & save a new file called ``BadStrings.txt``
+5. Remove comments: ``sed -i -e '/<#/,/#>/c\\' script.ps1``
+6. Remove in-line comments (verify it works afterwards): ``sed -i '/^[ \t]*#/d; s/#[^"]*$//' script.ps1``
+
+
+### Replace double-quoted stuff (use every time re-using a ps script):
+The 60 is arbitrary number of max random words that will be used to replace the bad strings.``./wordwriter.sh $(wc -l BadStrings.txt) cleanwords.txt 60 > GoodStrings.txt``
+``awk 'NR==FNR {gsub(/[\&:]/, "\\\\&"); a[NR]=$0; next} {gsub(/[\&:]/, "\\\\&"); print "s:"a[FNR]":"$0":g"}'  BadStrings.txt GoodStrings.txt > script.sed``
+``sed -f script.sed script.ps1 > change1.ps1``
 
 
 ## Disclaimer for "CleanUpPS1":
