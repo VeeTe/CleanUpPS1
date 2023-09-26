@@ -3,9 +3,9 @@ Clean up powershell scripts
 
 ## Usage:
 
-### One-time setup (per unique powershell script):
+### One-time setup:
 Once this is done you do not have to repeat it with the same powershell script:
-1. Optional: if using your own dictionary, ensure you remove the bad characters & sus words from it. ``sed -i 's/[,"\\]//g' cleanwords.txt``
+1. Verify .sh scripts have correct perms :) ``chmod +x`` them if needed.
 2. ``sed -n -e 's/[^"]*"\([^"]*\)"/\1\n/gp' script.ps1 > PotentiallyBadStrings.txt``
 3. ``cat PotentiallyBadStrings.txt | sort -u > UniquePotentiallyBadStrings.txt`` 
 4. Manually examine the ``UniquePotentiallyBadStrings.txt`` strings add strings that should be replaced or remove unnecessary words that should not be replaced & save a new file called ``BadStrings.txt``
@@ -13,10 +13,21 @@ Once this is done you do not have to repeat it with the same powershell script:
 6. Remove in-line comments (verify it works afterwards): ``sed -i '/^[ \t]*#/d; s/#[^"]*$//' script.ps1``
 
 
-### Replace double-quoted stuff (use every time re-using a ps script):
-The 60 is arbitrary number of max random words that will be used to replace the bad strings.``./wordwriter.sh $(wc -l BadStrings.txt) cleanwords.txt 60 > GoodStrings.txt``
-``awk 'NR==FNR {gsub(/[\&:]/, "\\\\&"); a[NR]=$0; next} {gsub(/[\&:]/, "\\\\&"); print "s:"a[FNR]":"$0":g"}'  BadStrings.txt GoodStrings.txt > script.sed``
-``sed -f script.sed script.ps1 > change1.ps1``
+### Replace double-quoted stuff:
+(use every time re-using a ps script)
+1. The 60 is arbitrary number of max random words that will be used to replace the bad strings.``./Scripts/GenerateGoodString.sh $(wc -l BadStrings.txt) cleanwords.txt 60 > GoodStrings.txt``
+2. ``awk 'NR==FNR {gsub(/[\&:]/, "\\\\&"); a[NR]=$0; next} {gsub(/[\&:]/, "\\\\&"); print "s:"a[FNR]":"$0":g"}'  BadStrings.txt GoodStrings.txt > script.sed``
+3. ``sed -f script.sed script.ps1 > change1.ps1``
+
+### Sprinking random comments thoughout the code, increasing the file-size & decreasing entropy:
+(use every time re-using a ps script)
+1. ``shuf cleanwords.txt | head -n 40 > smallwords.txt``
+2. ``./Scripts/AddRandomComments.sh change1.ps1 smallwords.txt 200 1000``
+
+### Creating your own dictionary:
+1. Find a dictionary you like by googling: ``dictionary filetype:txt site:github.com``
+2. Keep use only alphabetic entries, between 2 and 10 characters: ``grep -E '^[[:alpha:]]{2,10}$' words.txt | sort -u > cleanwords.txt``
+3. If you have time, read through the words manually, to remove bad words & suspicious entries.
 
 
 ## Disclaimer for "CleanUpPS1":
