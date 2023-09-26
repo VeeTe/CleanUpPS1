@@ -19,7 +19,8 @@ Once this is done you do not have to repeat it with the same powershell script:
 2. ``awk 'NR==FNR {gsub(/[\&:]/, "\\\\&"); a[NR]=$0; next} {gsub(/[\&:]/, "\\\\&"); print "s:"a[FNR]":"$0":g"}'  BadStrings.txt GoodStrings.txt > script.sed``
 3. ``sed -f script.sed script.ps1 > change1.ps1``
 
-### Sprinking random comments thoughout the code, increasing the file-size & decreasing entropy:
+### Sprinking random comments thoughout the code:
+increasing the file-size & decreasing entropy
 (use every time re-using a ps script)
 1. ``shuf cleanwords.txt | head -n 40 > smallwords.txt``
 2. ``./Scripts/AddRandomComments.sh change1.ps1 smallwords.txt 200 1000``
