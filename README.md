@@ -1,5 +1,5 @@
 # CleanUpPS1
-Clean up powershell scripts 
+Clean up powershell scripts (using Linux only)
 
 ## Usage:
 
